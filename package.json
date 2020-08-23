@@ -1,0 +1,16 @@
+{
+  "name": "example1",
+  "version": "1.0.0",
+  "description": "demo of aws s3 copy",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "aws-sdk": "^2.738.0",
+    "axios": "^0.20.0",
+    "request": "^2.88.2"
+  }
+}
