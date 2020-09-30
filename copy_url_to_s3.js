@@ -19,7 +19,35 @@ async function fetchFromUrl(url) {
     return response.data;
 }
 
-async function copy_url_into_s3(urlbase, pathfromroot, dest_bucket) {
+async function copy_url_into_s3(urlbase, pathfromroot, dest_bucket, check_if_exists) {
+    const s3Dest = new AWS.S3({ params: { Bucket: dest_bucket }});
+    let skipCopy;
+
+    skipCopy = false;
+    if (check_if_exists) {
+        const check_params = {
+            Bucket: dest_bucket,
+            Key: pathfromroot,
+        }
+        skipCopy = new Promise(resolve => {
+            s3Dest.headObject(check_params, function (err, data) {
+                    if (err) {
+                        // 404 is the normal code we'd get back if the key doesn't exist.
+                        if (err.statusCode !== 404) {
+                            console.log('Error calling headObject');
+                            console.log('err, err.stack', err, err.stack);
+                        }
+                        resolve(false)
+                    } else {
+                        console.log("Object exists in destination bucket.  Skipping copy.");
+                        resolve(true);
+                    }
+                }
+            );
+        });
+        await skipCopy
+    }
+    if (skipCopy) return;
     const fullUrl = urlbase + pathfromroot;
     let data;
     try {
